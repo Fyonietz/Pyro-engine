@@ -1,0 +1,7 @@
+1.Input File Inti (Index.html)
+2.Cari @@ syntax
+3.Copy
+4.Input File Child(child.htpp)
+5.cari @ syntax
+6.Copy Di Line Tersebut
+7.Output File(child.htpp) 
