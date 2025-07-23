@@ -16,20 +16,12 @@ int main(){
     std::string file_buffer_string(file_buffer.str());
 
     std::vector<std::string> after_scan;
-    size_t scan_begin = file_buffer_string.find("@@menu");
-    size_t scan_end = file_buffer_string.find("@@end");
+    size_t scan_begin = file_buffer_string.find("@");
     while (scan_begin != std::string::npos)
     {
         // std::cout << file_buffer_string << std::endl;
-      
-        scan_end = file_buffer_string.find("@@end",scan_begin);
-        if(!scan_begin){
-            std::cerr << "Cannot find it" << std::flush;
-            break;
-        }
-        std::string matching = file_buffer_string.substr(scan_begin+6,scan_end-scan_begin-6);
-        after_scan.push_back(matching);
-        scan_begin = file_buffer_string.find("@@menu",scan_begin+1);
+        scan_begin = file_buffer_string.find("@",scan_begin-1);
+        after_scan.push_back(file_buffer_string);
     }
     for(auto cs : after_scan){
         std::cout << cs ;

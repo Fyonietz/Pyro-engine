@@ -1,8 +1,8 @@
-@start
-@menu
-@headline
-@paragraph
-@end
-@button
-@image
-@link
+@@start
+@@menu
+@@headline
+@@paragraph
+@@end
+@@button
+@@image
+@@link

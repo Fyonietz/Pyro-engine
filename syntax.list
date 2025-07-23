@@ -1,8 +1,3 @@
-@start
-@menu
-@headline
-@paragraph
-@end
-@button
-@image
-@link
+
+    <div><li>Menu</li></div>
+    
