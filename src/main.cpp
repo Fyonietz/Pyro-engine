@@ -5,35 +5,46 @@
 #include <ostream>
 #include <vector>
 
-int main(){
-    std::fstream file("layout.html");
-    if(!file){
-        std::cerr << "File Is Not Exist" << std::flush;
-    }
-    std::ofstream file_output("syntax.list");
+void copy_block(std::string layout,std::string tag){
+    std::fstream file(layout);
+
     std::stringstream file_buffer;
     file_buffer << file.rdbuf();
     std::string file_buffer_string(file_buffer.str());
-
-    std::vector<std::string> after_scan;
-    size_t scan_begin = file_buffer_string.find("@@menu");
+    size_t scan_begin = file_buffer_string.find(tag);
     size_t scan_end = file_buffer_string.find("@@end");
-    while (scan_begin != std::string::npos)
-    {
-        // std::cout << file_buffer_string << std::endl;
-      
+    std::string matching = file_buffer_string.substr(scan_begin+tag.length(),scan_end-scan_begin-tag.length());
+
+    while(scan_begin != std::string::npos){
         scan_end = file_buffer_string.find("@@end",scan_begin);
-        if(!scan_begin){
-            std::cerr << "Cannot find it" << std::flush;
-            break;
+        if(!scan_end){
+            std::cerr<< "Error" << std::endl;
         }
-        std::string matching = file_buffer_string.substr(scan_begin+6,scan_end-scan_begin-6);
-        after_scan.push_back(matching);
-        scan_begin = file_buffer_string.find("@@menu",scan_begin+1);
+        matching = file_buffer_string.substr(scan_begin+tag.length(),scan_end-scan_begin-tag.length());
+        scan_begin = file_buffer_string.find(tag,scan_begin+1);
+        std::cout << matching << std::endl;
     }
-    for(auto cs : after_scan){
-        std::cout << cs ;
-        file_output << cs;
+}
+
+
+
+
+int main(){
+    std::fstream syntax("syntax.list");
+
+    std::vector<std::string> tag_list_vect;
+    std::string tag_list;
+
+    if(syntax.is_open()){
+        while(std::getline(syntax,tag_list)){
+        tag_list_vect.push_back(tag_list);
+        }
+    }else{
+        std::cerr << "File May Not Exits" << std::endl;
+    }
+ 
+    for(const auto &for_tag : tag_list_vect){
+        copy_block("layout.html",for_tag);
     }
     
 

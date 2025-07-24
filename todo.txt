@@ -5,3 +5,8 @@
 5.cari @ syntax
 6.Copy Di Line Tersebut
 7.Output File(child.htpp) 
+
+
+logicnya
+1.baca array lalu jabarkan 
+2.setiap array lakukan loop 1 kali untuk find block
