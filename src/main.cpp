@@ -60,12 +60,36 @@ void insert_block(std::string child, std::string tag) {
     std::ofstream file_output(child);
     file_output << file_input_str;
 }
+std::string erase_block(std::string content, const std::string& tag) {
+    std::istringstream stream(content);
+    std::ostringstream output;
+    std::string line;
+    bool skip_next = false;
 
+    while (std::getline(stream, line)) {
+        if (line.find(tag) != std::string::npos) {
+            skip_next = true; 
+            continue;
+        }
+
+        if (skip_next) {
+            skip_next = false;
+            continue; 
+        }
+
+        output << line << '\n';
+    }
+
+    return output.str();
+}
 
 
 int main() {
     std::fstream syntax("syntax.list");
-
+    std::ifstream file("child.html");
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string content = buffer.str();
     std::vector<std::string> tag_list_vect;
     std::string tag_list;
 
@@ -77,12 +101,15 @@ int main() {
         std::cerr << "File may not exist: syntax.list" << std::endl;
         return 1;
     }
-
+    std::string s;
     for (const auto& for_tag : tag_list_vect) {
         std::cout << copy_block("layout.html", for_tag) << std::endl;
 
-        insert_block("child.html", for_tag);
+        // insert_block("child.html", for_tag);
+        content = erase_block(content,for_tag);
     }
+    std::ofstream output("child.htpp");
+    output << content;
 
     return 0;
 }
