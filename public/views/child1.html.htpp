@@ -7,10 +7,9 @@
 </head>
 <body>
  
-    @menu
-
     <div><li>Menu</li></div>
     
+    <div><h1>Welcome</h1></div>
     
   
 </body>

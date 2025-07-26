@@ -3,6 +3,29 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <filesystem>
+
+std::vector<std::string> dir_listing(){
+    std::filesystem::path path = "public/views";
+    std::vector<std::string> file_list;
+    try
+    {
+        for(const auto &entry : std::filesystem::recursive_directory_iterator(path)){
+            if(std::filesystem::is_regular_file(entry)&& entry.path().extension()==".html"){
+                std::filesystem::path rel_path = std::filesystem::relative(entry.path(),path);
+                // std::cout << rel_path <<  std::endl;
+                file_list.push_back(entry.path().string());
+            }
+        }
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+    return file_list;
+}
+
+
 
 std::string copy_block(std::string layout, std::string tag) {
     std::fstream file(layout);
@@ -38,7 +61,7 @@ void insert_block(std::string child, std::string tag) {
     std::string file_input_str = file_input_stream.str();
     file_input.close();
 
-    std::string insert = copy_block("layout.html", tag);
+    std::string insert = copy_block("public/layout.html", tag);
     if (insert.empty()) return;
 
     size_t scan_begin = 0;
@@ -60,7 +83,17 @@ void insert_block(std::string child, std::string tag) {
     std::ofstream file_output(child);
     file_output << file_input_str;
 }
-std::string erase_block(std::string content, const std::string& tag) {
+std::string erase_block(const std::string& filepath, const std::string& tag) {
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        std::cerr << "Cannot open file: " << filepath << '\n';
+        return "";
+    }
+
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string content = buffer.str();
+
     std::istringstream stream(content);
     std::ostringstream output;
     std::string line;
@@ -83,16 +116,13 @@ std::string erase_block(std::string content, const std::string& tag) {
     return output.str();
 }
 
-
 int main() {
     std::fstream syntax("syntax.list");
-    std::ifstream file("child.html");
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    std::string content = buffer.str();
     std::vector<std::string> tag_list_vect;
+    std::vector<std::string> child_file_list_vect;
+    std::string child_file_list;
     std::string tag_list;
-
+    std::vector<std::string> dir= dir_listing();
     if (syntax.is_open()) {
         while (std::getline(syntax, tag_list)) {
             tag_list_vect.push_back(tag_list);
@@ -101,15 +131,20 @@ int main() {
         std::cerr << "File may not exist: syntax.list" << std::endl;
         return 1;
     }
-    std::string s;
+    std::string content;
     for (const auto& for_tag : tag_list_vect) {
-        std::cout << copy_block("layout.html", for_tag) << std::endl;
-
-        // insert_block("child.html", for_tag);
-        content = erase_block(content,for_tag);
+        copy_block("public/layout.html", for_tag);
+        for(const auto &file_list : dir){
+              insert_block(file_list, for_tag);
+              content = erase_block(file_list,for_tag);
+              std::cout << content << std::endl;
+                std::ofstream output(file_list+".htpp");
+                output << content;
+        }
+      
     }
-    std::ofstream output("child.htpp");
-    output << content;
+  
+    
 
     return 0;
 }
